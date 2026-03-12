@@ -14,7 +14,7 @@ async def detect_image(file: UploadFile = File(...)):
     contents = await file.read()
     image = Image.open(io.BytesIO(contents))
     result = predict(image)
-    return result")
+    return result
 def home():
     return {"message": "Deepfake API running"}
 
@@ -86,3 +86,4 @@ async def detect_screen(frame: dict):
     image = Image.open(io.BytesIO(img_bytes))
 
     return predict(image)
+
