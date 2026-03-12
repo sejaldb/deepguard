@@ -1,28 +1,20 @@
-# backend/main.py
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-import io
-import base64
-import tempfile
+from fastapi import FastAPI, UploadFile, File
 from PIL import Image
+import io
+from .model import predict  # <- fixed relative import
 
-from model import predict
-from utils import download_image, extract_frames_from_video
+app = FastAPI()
 
-app = FastAPI(title="Deepfake Detection API")
-
-# Allow CORS for frontend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# --------------------------
-# Test endpoint
-# --------------------------
 @app.get("/")
+def home():
+    return {"message": "Deepfake API running"}
+
+@app.post("/api/detect-image")
+async def detect_image(file: UploadFile = File(...)):
+    contents = await file.read()
+    image = Image.open(io.BytesIO(contents))
+    result = predict(image)
+    return result")
 def home():
     return {"message": "Deepfake API running"}
 
@@ -92,4 +84,5 @@ async def detect_screen(frame: dict):
         raise HTTPException(status_code=400, detail="Frame missing")
     img_bytes = base64.b64decode(frame_b64)
     image = Image.open(io.BytesIO(img_bytes))
+
     return predict(image)
